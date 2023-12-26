@@ -22,7 +22,7 @@ namespace API.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("API.Modals.ApplicationUser", b =>
+            modelBuilder.Entity("API.Models.ApplicationUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -90,7 +90,33 @@ namespace API.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("API.Modals.MenuItem", b =>
+            modelBuilder.Entity("API.Models.CartItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("MenuItemId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ShoppingCartId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MenuItemId");
+
+                    b.HasIndex("ShoppingCartId");
+
+                    b.ToTable("CartItems");
+                });
+
+            modelBuilder.Entity("API.Models.MenuItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -223,6 +249,22 @@ namespace API.Migrations
                             Price = 3.9900000000000002,
                             SpecialTag = "Top Rated"
                         });
+                });
+
+            modelBuilder.Entity("API.Models.ShoppingCart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShoppingCarts");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -358,6 +400,23 @@ namespace API.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("API.Models.CartItem", b =>
+                {
+                    b.HasOne("API.Models.MenuItem", "MenuItem")
+                        .WithMany()
+                        .HasForeignKey("MenuItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("API.Models.ShoppingCart", null)
+                        .WithMany("CartItems")
+                        .HasForeignKey("ShoppingCartId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MenuItem");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -369,7 +428,7 @@ namespace API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("API.Modals.ApplicationUser", null)
+                    b.HasOne("API.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -378,7 +437,7 @@ namespace API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("API.Modals.ApplicationUser", null)
+                    b.HasOne("API.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -393,7 +452,7 @@ namespace API.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("API.Modals.ApplicationUser", null)
+                    b.HasOne("API.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -402,11 +461,16 @@ namespace API.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("API.Modals.ApplicationUser", null)
+                    b.HasOne("API.Models.ApplicationUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("API.Models.ShoppingCart", b =>
+                {
+                    b.Navigation("CartItems");
                 });
 #pragma warning restore 612, 618
         }
